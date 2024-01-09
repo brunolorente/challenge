@@ -12,7 +12,7 @@ class CsvReaderTest extends TestCase
         // given
         $csvReader = new CsvReader();
         // when
-        $result = $csvReader->readCsv('/var/www/tests/Data/merchants.csv');
+        $result = $csvReader->readCsvFromFile('/var/www/tests/Data/merchants.csv');
         // then
         $this->assertIsArray($result);
         $this->assertCount(50, $result);
@@ -23,7 +23,7 @@ class CsvReaderTest extends TestCase
         // given
         $csvReader = new CsvReader();
         // when
-        $result = $csvReader->readCsv('/var/www/tests/Data/merchants-without-header.csv', false);
+        $result = $csvReader->readCsvFromFile('/var/www/tests/Data/merchants-without-header.csv', false);
         // then
         $this->assertIsArray($result);
         $this->assertCount(50, $result);

@@ -24,6 +24,8 @@ COPY . /var/www
 # Establecer el directorio de trabajo
 WORKDIR /var/www
 
+RUN echo "memory_limit=1G" >> /usr/local/etc/php/php.ini
+
 # Instalar dependencias de Composer
 RUN composer install --no-interaction
 

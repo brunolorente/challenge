@@ -19,7 +19,7 @@ class MerchantImporterFromCsv implements MerchantImporterInterface
             fn($merchant) => $this->merchantRepository->insert($merchant),
             array_map(
                 fn($merchant) => $this->merchantDataTransformer->transform($merchant),
-                $this->csvReader->readCsv($file)
+                $this->csvReader->readCsvFromFile($file)
             )
         );
     }
