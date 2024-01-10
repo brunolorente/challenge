@@ -10,12 +10,6 @@ use Illuminate\Support\Facades\Log;
 
 class EloquentDisbursementRepository implements DisbursementRepositoryInterface
 {
-
-    public function findDisbursementsGroupedByYear(): array
-    {
-        // TODO: Implement findDisbursementsGroupedByYear() method.
-    }
-
     public function insertDisbursement(DisbursementData $disbursementData): bool
     {
         $disbursement = new Disbursement($disbursementData->toArray());
