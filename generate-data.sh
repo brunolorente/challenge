@@ -41,6 +41,6 @@ while [ $current -le $end ]; do
     current=$(( $current + 86400 ))
 done
 
-echo "Data generation completed.\n"
+echo "Data generation completed."
 
 php artisan sequra:summary

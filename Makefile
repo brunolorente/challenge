@@ -3,7 +3,21 @@ include .env
 PHP_CONTAINER_NAME = sequra-laravel_app
 DOCKER_COMPOSE = docker-compose -f ./docker-compose.yml
 
-.PHONY: start stop status destroy build urls ssh-php tests migrate generate-data
+.PHONY: start stop status destroy build urls ssh-php tests migrate generate-data help
+
+help:
+	@echo "\033[1;32mUsage:\033[0m"
+	@echo "  \033[1;34mstart\033[0m         🚀 Starts the docker containers."
+	@echo "  \033[1;34mstop\033[0m          🛑 Stops the docker containers."
+	@echo "  \033[1;34mstatus\033[0m        📊 Displays the status of the docker containers."
+	@echo "  \033[1;34mdestroy\033[0m       💥 Destroys the docker containers and volumes."
+	@echo "  \033[1;34mbuild\033[0m         🔧 Builds the docker images and starts the containers."
+	@echo "  \033[1;34murls\033[0m          🌐 Shows the available URLs."
+	@echo "  \033[1;34mssh-php\033[0m       💻 SSH into the PHP container."
+	@echo "  \033[1;34mtests\033[0m         🧪 Runs the Laravel tests."
+	@echo "  \033[1;34mmigrate\033[0m       🗃️  Runs the database migrations."
+	@echo "  \033[1;34mgenerate-data\033[0m 📈 Generates dummy data."
+	@echo "  \033[1;34mhelp\033[0m          🆘 Displays this help message."
 
 start:
 	@echo "Starting services..."
@@ -36,16 +50,13 @@ build: check-env destroy
 	@echo "Waiting for services to be fully up and running..."
 	@sleep 15  # Espera 15 segundos antes de ejecutar los tests
 	@${MAKE} tests
-	@${MAKE} urls
+	@${MAKE} generate-data
 
 check-env:
 	@if [ ! -f ".env" ] || [ ! -f ".env.test" ]; then \
 		echo 'One or more configuration files are missing. Please, create them following the README instructions.'; \
 		exit 1; \
 	fi
-
-urls:
-	@echo "\nThe available URL is:\n   http://localhost:8080\n"
 
 ssh-php:
 	@docker exec -ti $(PHP_CONTAINER_NAME) bash
