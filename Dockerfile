@@ -10,7 +10,8 @@ RUN apt-get update && apt-get install -y \
     unzip \
     git \
     curl \
-    libpq-dev # <- Agregar esta línea
+    procps \
+    libpq-dev
 
 # Instalar extensiones de PHP
 RUN docker-php-ext-install pdo_mysql mbstring zip exif pcntl bcmath gd pdo_pgsql pgsql # <- Agregar pdo_pgsql y pgsql

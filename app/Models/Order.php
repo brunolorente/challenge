@@ -2,11 +2,14 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
 class Order extends Model
 {
+    use HasFactory;
+
     public $timestamps = false;
     public $incrementing = false;
 
@@ -18,6 +21,7 @@ class Order extends Model
         'created_at',
         'ingest_date',
         'origin',
+        'disbursed',
     ];
 
     protected static function boot()

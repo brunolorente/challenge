@@ -12,8 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('orders', function (Blueprint $table) {
-            $table->uuid('id');
-            $table->string('external_id', 64)->primary();
+            $table->uuid('id')->primary();
+            $table->string('external_id', 64);
             $table->string('merchant_reference')->index();
             $table->float('amount', 9, 2);
             $table->date('created_at');

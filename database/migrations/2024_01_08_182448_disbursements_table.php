@@ -11,7 +11,18 @@ return new class extends Migration
      */
     public function up(): void
     {
-        //
+        Schema::create('disbursements', function (Blueprint $table) {
+            $table->uuid('id')->primary();
+            $table->float('amount',9, 2);
+            $table->integer('nb_of_orders')->default(0);
+            $table->uuid('merchant_id');
+            $table->float('commission',8, 2);
+            $table->date('orders_start');
+            $table->date('orders_end');
+            $table->uuid('reference')->unique();
+
+            $table->timestamps();
+        });
     }
 
     /**
@@ -19,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        //
+        Schema::drop('disbursements');
     }
 };

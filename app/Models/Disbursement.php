@@ -2,28 +2,24 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
 
-class Merchant extends Model
+class Disbursement extends Model
 {
-    use HasFactory;
-
-    public $timestamps = false;
     public $incrementing = false;
 
     protected $keyType = 'string';
     protected $fillable = [
-        'external_id',
+        'amount',
+        'merchant_id',
+        'merchant_id',
+        'commission',
+        'commission_percent',
+        'orders_start',
+        'orders_end',
         'reference',
-        'email',
-        'live_on',
-        'disbursement_frequency',
-        'minimum_monthly_fee',
-        'ingest_date',
-        'origin',
+        'nb_of_orders',
     ];
 
     protected static function boot()
@@ -34,10 +30,5 @@ class Merchant extends Model
                 $model->{$model->getKeyName()} = Str::uuid()->toString();
             }
         });
-    }
-
-    public function orders(): HasMany
-    {
-        return $this->hasMany(Order::class, "merchant_reference", "reference");
     }
 }

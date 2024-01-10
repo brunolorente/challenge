@@ -2,11 +2,13 @@
 
 namespace App\Providers;
 
+use App\Contracts\DisbursementRepositoryInterface;
 use App\Contracts\FileDownloaderInterface;
 use App\Contracts\MerchantImporterInterface;
 use App\Contracts\MerchantRepositoryInterface;
 use App\Contracts\OrderImporterInterface;
 use App\Contracts\OrderRepositoryInterface;
+use App\Repositories\EloquentDisbursementRepository;
 use App\Repositories\EloquentMerchantRepository;
 use App\Repositories\EloquentOrderRepository;
 use App\Services\CurlFileDownloader;
@@ -26,6 +28,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(OrderImporterInterface::class, OrderImporterFromCsv::class);
         $this->app->bind(OrderRepositoryInterface::class, EloquentOrderRepository::class);
         $this->app->bind(FileDownloaderInterface::class, CurlFileDownloader::class);
+        $this->app->bind(DisbursementRepositoryInterface::class, EloquentDisbursementRepository::class);
     }
 
     /**

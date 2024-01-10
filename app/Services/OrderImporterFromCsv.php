@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Contracts\FileDownloaderInterface;
 use App\Contracts\OrderImporterInterface;
 use App\Contracts\OrderRepositoryInterface;
+use Illuminate\Support\Facades\Log;
 
 class OrderImporterFromCsv implements OrderImporterInterface
 {
@@ -69,9 +70,9 @@ class OrderImporterFromCsv implements OrderImporterInterface
         try {
             $this->orderRepository->insert($this->dataTransformer->transform($order));
         } catch (\TypeError $e) {
-            dump($e->getMessage());
+            Log::error(sprintf('Error: % inserting order %s', $e->getMessage(), json_encode($order)));
         } catch (\Exception $e) {
-            dump($e->getMessage());
+            Log::error(sprintf('Error: % inserting order %s', $e->getMessage(), json_encode($order)));
         }
     }
 }
