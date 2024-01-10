@@ -2,6 +2,7 @@
 
 namespace Feature\Services;
 
+use App\Models\AdditionalFee;
 use App\Models\Disbursement;
 use App\Services\DisbursementService;
 use App\Models\Merchant;
@@ -63,11 +64,35 @@ class DisbursementServiceTest extends TestCase
 
     }
 
+    public function testCalculateDisbursementsWithAmountOfMonthlyFeeCharged()
+    {
+        // given
+        $disbursementService = $this->app->make(DisbursementService::class);
+
+        // when
+        $disbursementService->calculateDisbursements(Carbon::createFromFormat('Y-m-d', '2023-02-01'));
+
+        // then
+        $allDisbursements = Disbursement::all();
+        $total = 0;
+        foreach ($allDisbursements as $disbursement) {
+            $total += $disbursement->nb_of_orders;
+        }
+        $additionalFees = AdditionalFee::all();
+        $totalAdditionalFee = 0;
+        foreach ($additionalFees as $additionalFee) {
+            $totalAdditionalFee += $additionalFee->fee;
+        }
+        $this->assertEquals(4, $total); // this is just 4 because the orders for the daily merchant are for other date
+        $this->assertEquals(1, $additionalFees->count());
+        $this->assertEquals(29.94, $totalAdditionalFee);
+    }
 
     private function generateMerchants()
     {
         Merchant::factory(1)->dailyMerchant()->create();
         Merchant::factory(1)->weeklyMerchant()->create();
+        Merchant::factory(1)->poorMerchant()->create();
     }
 
     private function generateOrders()
@@ -77,6 +102,10 @@ class DisbursementServiceTest extends TestCase
             $order->save();
         }
         foreach (Order::factory(1)->weeklyMerchantOrders() as $order)
+        {
+            $order->save();
+        }
+        foreach (Order::factory(1)->poorMerchantOrders() as $order)
         {
             $order->save();
         }

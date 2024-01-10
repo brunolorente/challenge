@@ -47,4 +47,19 @@ class MerchantFactory extends Factory
             ];
         });
     }
+
+    public function poorMerchant() {
+        return $this->state(function (array $attributes) {
+            return [
+                "id" => "c19fbb44-1fc5-424d-af2f-e15b53425466",
+                "external_id" => "a890d808-7f29-4ec5-bd93-5703bb1c149f",
+                "reference" => "poor_merchant",
+                "live_on" => "2023-01-25",
+                "disbursement_frequency" => "WEEKLY",
+                "minimum_monthly_fee" => "30",
+                "ingest_date" => "2024-01-09 09:15:14",
+                "origin" => "csv",
+            ];
+        });
+    }
 }

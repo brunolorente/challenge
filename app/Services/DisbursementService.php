@@ -2,9 +2,11 @@
 
 namespace App\Services;
 
+use App\Contracts\AdditionalFeeInterface;
 use App\Contracts\DisbursementRepositoryInterface;
 use App\Contracts\MerchantRepositoryInterface;
 use App\Contracts\OrderRepositoryInterface;
+use App\DTOs\AdditionalFeeData;
 use App\DTOs\DisbursementData;
 use App\Models\Merchant;
 use App\Models\Order;
@@ -22,6 +24,7 @@ class DisbursementService
         private MerchantRepositoryInterface $merchantRepository,
         private OrderRepositoryInterface $orderRepository,
         private DisbursementRepositoryInterface $disbursementRepository,
+        private AdditionalFeeInterface $additionalFeeRepository,
     ){
     }
 
@@ -33,17 +36,16 @@ class DisbursementService
             if ($this->isEligibleForDisbursement($merchant, $date)) {
                 $orders = $this->getEligibleOrders($merchant, $merchant->disbursement_frequency, $date);
                 if(count($orders) > 0) {
-                    $this->processDisbursement($merchant, $orders);
+                    $this->processDisbursement($merchant, $orders, $date);
                 }
             }
         }
     }
 
-    private function processDisbursement(Merchant $merchant, array $orders): void
+    private function processDisbursement(Merchant $merchant, array $orders, DateTimeInterface $date): void
     {
         $disbursementAmount = 0;
         $commissionAmount = 0;
-
         foreach ($orders as $order) {
             $commission = $this->calculateCommission($order);
             $disbursementAmount += ($order->amount - $commission);
@@ -51,7 +53,7 @@ class DisbursementService
 
             $this->orderRepository->updateOrderAsDisbursed(Uuid::fromString($order->id));
         }
-        $this->saveAdditionalFeeForMonthlyMin($merchant);
+        $this->saveAdditionalFeeForMonthlyMin($merchant, $date);
         $this->saveDisbursement($disbursementAmount, Uuid::fromString($merchant->id), $commissionAmount, count($orders));
     }
 
@@ -70,44 +72,38 @@ class DisbursementService
         );
     }
 
-    private function saveAdditionalFeeForMonthlyMin(Merchant $merchant): void
+    private function saveAdditionalFeeForMonthlyMin(Merchant $merchant, DateTimeInterface $date): void
     {
-        if (Carbon::now()->startOfMonth()->isToday()) {
-            $additionalFeeNeeded = $this->calculateAdditionalFee($merchant);
-
+        $carbonDate = Carbon::parse($date)->startOf('MONTH');
+        if ($carbonDate->format('Y-m-d') === $date->format('Y-m-d')) {
+            $additionalFeeNeeded = $this->calculateAdditionalFee($merchant, $date);
             if ($additionalFeeNeeded > 0) {
-                // TODO: Verificar y calcular la cuota mínima mensual si es el primer desembolso del mes
-                $additionalFeeRecord = [
-                    'merchant_id' => $merchant->id,
-                    'month' => Carbon::now()->subMonthNoOverflow()->format('Y-m'),
+                $this->additionalFeeRepository->insert(AdditionalFeeData::fromArray([
+                    'merchant_id' => Uuid::fromString($merchant->id),
+                    'date' => $carbonDate,
                     'fee' => $additionalFeeNeeded,
-                ];
+                ]));
             }
         }
     }
 
-    /**
-     * @todo Calcula la cuota adicional necesaria para alcanzar la cuota mínima mensual.
-     */
-    private function calculateAdditionalFee(Merchant $merchant): float|int
+    private function calculateAdditionalFee(Merchant $merchant, DateTimeInterface $date): float|int
     {
-        $startOfLastMonth = Carbon::now()->subMonthNoOverflow()->startOfMonth();
+        $startOfLastMonth = Carbon::parse($date)->startOf('MONTH')->subMonthNoOverflow()->startOfMonth();
         $endOfLastMonth = $startOfLastMonth->copy()->endOfMonth();
-        /*
-        $totalCommissionsLastMonth = $merchant->orders()
+
+        $totalOrdersLastMonth = $merchant->orders()
             ->whereBetween('created_at', [$startOfLastMonth, $endOfLastMonth])
-            ->where('disbursed', false)->get();
-            //->sum('commission');
-        $totalComissionReal = 0;
+            ->get();
 
-        foreach ($totalCommissionsLastMonth as $order) {
-            $totalComissionReal = $totalComissionReal + $this->calculateCommission($order);
+        $totalCommissionsLastMonth = 0;
+        foreach ($totalOrdersLastMonth as $order) {
+            $totalCommissionsLastMonth += $this->calculateCommission($order);
         }
-        */
 
-        //if ($totalCommissionsLastMonth < $merchant->minimum_monthly_fee) {
-        //    return $merchant->minimum_monthly_fee - $totalCommissionsLastMonth;
-        //}
+        if ($totalCommissionsLastMonth < $merchant->minimum_monthly_fee) {
+            return $merchant->minimum_monthly_fee - $totalCommissionsLastMonth;
+        }
 
         return 0;
     }

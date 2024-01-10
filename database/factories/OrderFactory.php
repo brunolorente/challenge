@@ -112,4 +112,19 @@ class OrderFactory extends Factory
             ]),
         ]);
     }
+
+    public function poorMerchantOrders() {
+        return collect([
+            new Order([
+                "id" => "e24e5b39-a2e7-4cf9-8240-f6c87b6cba83",
+                "external_id" => "bbf13e3a6daa",
+                "merchant_reference" => "poor_merchant",
+                "amount" => "6.1",
+                "created_at" => "2023-01-31",
+                "ingest_date" => "2024-01-09 08:33:28",
+                "origin" => "csv",
+                "disbursed" => false,
+            ]),
+        ]);
+    }
 }
