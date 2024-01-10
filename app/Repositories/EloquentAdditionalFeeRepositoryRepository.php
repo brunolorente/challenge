@@ -2,12 +2,12 @@
 
 namespace App\Repositories;
 
-use App\Contracts\AdditionalFeeInterface;
+use App\Contracts\AdditionalFeeRepositoryInterface;
 use App\DTOs\AdditionalFeeData;
 use App\Models\AdditionalFee;
 use Illuminate\Support\Facades\Log;
 
-class EloquentAdditionalFeeRepository implements AdditionalFeeInterface
+class EloquentAdditionalFeeRepositoryRepository implements AdditionalFeeRepositoryInterface
 {
     public function insert(AdditionalFeeData $feeData): bool
     {

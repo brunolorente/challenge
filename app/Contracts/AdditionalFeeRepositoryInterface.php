@@ -4,7 +4,7 @@ namespace App\Contracts;
 
 use App\DTOs\AdditionalFeeData;
 
-interface AdditionalFeeInterface
+interface AdditionalFeeRepositoryInterface
 {
     public function insert(AdditionalFeeData $feeData): bool;
 }

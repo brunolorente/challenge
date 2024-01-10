@@ -2,14 +2,14 @@
 
 namespace App\Providers;
 
-use App\Contracts\AdditionalFeeInterface;
+use App\Contracts\AdditionalFeeRepositoryInterface;
 use App\Contracts\DisbursementRepositoryInterface;
 use App\Contracts\FileDownloaderInterface;
 use App\Contracts\MerchantImporterInterface;
 use App\Contracts\MerchantRepositoryInterface;
 use App\Contracts\OrderImporterInterface;
 use App\Contracts\OrderRepositoryInterface;
-use App\Repositories\EloquentAdditionalFeeRepository;
+use App\Repositories\EloquentAdditionalFeeRepositoryRepository;
 use App\Repositories\EloquentDisbursementRepository;
 use App\Repositories\EloquentMerchantRepository;
 use App\Repositories\EloquentOrderRepository;
@@ -31,7 +31,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(OrderRepositoryInterface::class, EloquentOrderRepository::class);
         $this->app->bind(FileDownloaderInterface::class, CurlFileDownloader::class);
         $this->app->bind(DisbursementRepositoryInterface::class, EloquentDisbursementRepository::class);
-        $this->app->bind(AdditionalFeeInterface::class, EloquentAdditionalFeeRepository::class);
+        $this->app->bind(AdditionalFeeRepositoryInterface::class, EloquentAdditionalFeeRepositoryRepository::class);
     }
 
     /**

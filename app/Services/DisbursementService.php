@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Contracts\AdditionalFeeInterface;
+use App\Contracts\AdditionalFeeRepositoryInterface;
 use App\Contracts\DisbursementRepositoryInterface;
 use App\Contracts\MerchantRepositoryInterface;
 use App\Contracts\OrderRepositoryInterface;
@@ -21,10 +21,10 @@ class DisbursementService
     private DateTimeInterface $end;
 
     public function __construct(
-        private MerchantRepositoryInterface $merchantRepository,
-        private OrderRepositoryInterface $orderRepository,
-        private DisbursementRepositoryInterface $disbursementRepository,
-        private AdditionalFeeInterface $additionalFeeRepository,
+        private MerchantRepositoryInterface      $merchantRepository,
+        private OrderRepositoryInterface         $orderRepository,
+        private DisbursementRepositoryInterface  $disbursementRepository,
+        private AdditionalFeeRepositoryInterface $additionalFeeRepository,
     ){
     }
 
