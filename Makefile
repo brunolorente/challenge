@@ -3,7 +3,7 @@ include .env
 PHP_CONTAINER_NAME = sequra-laravel_app
 DOCKER_COMPOSE = docker-compose -f ./docker-compose.yml
 
-.PHONY: start stop status destroy build urls ssh-php tests migrate generate-data help
+.PHONY: start stop status destroy build urls ssh-php tests migrate generate-data help phpstan
 
 help:
 	@echo "\033[1;32mUsage:\033[0m"
@@ -16,6 +16,7 @@ help:
 	@echo "  \033[1;34mtests\033[0m         🧪 Runs the Laravel tests."
 	@echo "  \033[1;34mmigrate\033[0m       🗃️ Runs the database migrations."
 	@echo "  \033[1;34mgenerate-data\033[0m 📈 Generates dummy data."
+	@echo "  \033[1;34mhelp\033[0m          🔧 Run phpstan."
 	@echo "  \033[1;34mhelp\033[0m          🆘 Displays this help message."
 
 start:
@@ -63,6 +64,9 @@ ssh-php:
 tests:
 	@echo "---------\nRunning Laravel tests...\n----------\n"
 	@docker exec -t $(PHP_CONTAINER_NAME) php artisan test
+
+phpstan:
+	@docker exec -t $(PHP_CONTAINER_NAME) ./vendor/bin/phpstan analyse
 
 migrate:
 	@echo "Running migrations..."
