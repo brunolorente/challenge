@@ -1,6 +1,5 @@
 FROM php:8.1-fpm
 
-# Instalar dependencias del sistema
 RUN apt-get update && apt-get install -y \
     libonig-dev \
     libpng-dev \
@@ -13,25 +12,27 @@ RUN apt-get update && apt-get install -y \
     procps \
     libpq-dev
 
-# Instalar extensiones de PHP
-RUN docker-php-ext-install pdo_mysql mbstring zip exif pcntl bcmath gd pdo_pgsql pgsql # <- Agregar pdo_pgsql y pgsql
+RUN docker-php-ext-install pdo_mysql mbstring zip exif pcntl bcmath gd pdo_pgsql pgsql
 
-# Instalar Composer
+RUN pecl install xdebug \
+    && docker-php-ext-enable xdebug
+
+RUN echo "xdebug.mode=debug" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
+    && echo "xdebug.client_host=host.docker.internal" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
+    && echo "xdebug.client_port=9003" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
+    && echo "xdebug.start_with_request=yes" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
+    && echo "xdebug.log=/var/www/xdebug.log" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
-# Copiar la aplicación
 COPY . /var/www
 
-# Establecer el directorio de trabajo
 WORKDIR /var/www
 
 RUN echo "memory_limit=1G" >> /usr/local/etc/php/php.ini
 
-# Instalar dependencias de Composer
 RUN composer install --no-interaction
 
-# Exponer puerto 9000
 EXPOSE 9000
 
-# Iniciar PHP-FPM
 CMD ["php-fpm"]
