@@ -8,7 +8,7 @@ use PHPUnit\Framework\TestCase;
 
 class MerchantDataTransformerTest extends TestCase
 {
-    public function testTransform()
+    public function testTransform(): void
     {
         // given
         $transformer = new MerchantDataTransformer();

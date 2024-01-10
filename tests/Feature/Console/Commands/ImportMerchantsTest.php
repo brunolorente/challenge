@@ -37,7 +37,7 @@ class ImportMerchantsTest extends TestCase
         $this->app->instance(MerchantImporterInterface::class, $this->merchantImporter);
     }
 
-    public function testImportMerchantsCommand()
+    public function testImportMerchantsCommand(): void
     {
         // given
 

@@ -19,7 +19,7 @@ class OrderImporterFromCsv implements OrderImporterInterface
     ){
     }
 
-    public function import(string $file)
+    public function import(string $file): void
     {
         $this->handlePartialDataImport($file);
     }
@@ -70,9 +70,9 @@ class OrderImporterFromCsv implements OrderImporterInterface
         try {
             $this->orderRepository->insert($this->dataTransformer->transform($order));
         } catch (\TypeError $e) {
-            Log::error(sprintf('Error: % inserting order %s', $e->getMessage(), json_encode($order)));
+            Log::error(sprintf('Error: %s inserting order %s', $e->getMessage(), json_encode($order)));
         } catch (\Exception $e) {
-            Log::error(sprintf('Error: % inserting order %s', $e->getMessage(), json_encode($order)));
+            Log::error(sprintf('Error: %s inserting order %s', $e->getMessage(), json_encode($order)));
         }
     }
 }

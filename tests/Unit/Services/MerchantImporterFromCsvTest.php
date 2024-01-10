@@ -6,14 +6,11 @@ use App\Contracts\MerchantRepositoryInterface;
 use App\Services\CsvReader;
 use App\Services\MerchantDataTransformer;
 use App\Services\MerchantImporterFromCsv;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class MerchantImporterFromCsvTest extends TestCase
 {
     private CsvReader $csvReader;
-    private MerchantDataTransformer $merchantDataTransformer;
-    private MerchantRepositoryInterface|MockObject $merchantRepository;
     private MerchantImporterFromCsv $merchantImporterFromCsv;
 
     protected function setUp(): void
@@ -26,7 +23,7 @@ class MerchantImporterFromCsvTest extends TestCase
         $this->merchantImporterFromCsv = new MerchantImporterFromCsv($this->csvReader, $this->mockRepository, $this->dataTransformer);
     }
 
-    public function testImport()
+    public function testImport(): void
     {
         // given
 

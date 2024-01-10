@@ -7,7 +7,7 @@ use PHPUnit\Framework\TestCase;
 
 class CsvReaderTest extends TestCase
 {
-    public function testReadCsvWithHeader()
+    public function testReadCsvWithHeader(): void
     {
         // given
         $csvReader = new CsvReader();
@@ -18,7 +18,7 @@ class CsvReaderTest extends TestCase
         $this->assertCount(50, $result);
     }
 
-    public function testReadCsvWithoutHeader()
+    public function testReadCsvWithoutHeader(): void
     {
         // given
         $csvReader = new CsvReader();

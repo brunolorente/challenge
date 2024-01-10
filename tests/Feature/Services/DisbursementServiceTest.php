@@ -24,7 +24,7 @@ class DisbursementServiceTest extends TestCase
     }
 
 
-    public function testCalculateDisbursementsForDailyMerchant()
+    public function testCalculateDisbursementsForDailyMerchant(): void
     {
         // given
         $disbursementService = $this->app->make(DisbursementService::class);
@@ -39,7 +39,7 @@ class DisbursementServiceTest extends TestCase
         $this->assertEquals(3, $generatedDisbursement->nb_of_orders);
     }
 
-    public function testCalculateDisbursementsForWeeklyMerchant()
+    public function testCalculateDisbursementsForWeeklyMerchant(): void
     {
         // given
         $disbursementService = $this->app->make(DisbursementService::class);
@@ -64,7 +64,7 @@ class DisbursementServiceTest extends TestCase
 
     }
 
-    public function testCalculateDisbursementsWithAmountOfMonthlyFeeCharged()
+    public function testCalculateDisbursementsWithAmountOfMonthlyFeeCharged(): void
     {
         // given
         $disbursementService = $this->app->make(DisbursementService::class);
@@ -88,14 +88,14 @@ class DisbursementServiceTest extends TestCase
         $this->assertEquals(29.94, $totalAdditionalFee);
     }
 
-    private function generateMerchants()
+    private function generateMerchants(): void
     {
         Merchant::factory(1)->dailyMerchant()->create();
         Merchant::factory(1)->weeklyMerchant()->create();
         Merchant::factory(1)->poorMerchant()->create();
     }
 
-    private function generateOrders()
+    private function generateOrders(): void
     {
         foreach (Order::factory(1)->dailyMerchantOrders() as $order)
         {
