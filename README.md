@@ -1,66 +1,244 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Challenge seQura
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## Requisitos:
+- Docker
+- Docker Compose
+- No editar .env ni .env.test
 
-## About Laravel
+## Uso:
+- En una CLI, ubicarnos dentro del directorio `challenge` y ejecutar el comando `make build`.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+##### El proceso ejecutará los contenedores de Docker necesarios para el proyecto, importará los datos, ejecutará los procesos del challenge y mostrará una tabla con los resultados.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Código:
+El código utilizado para la prueba (sin contar tests, migraciones, e infraestructura):
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+````
+app
+|-- Console
+|   |-- Commands
+|      |-- GenerateDisbursements.php
+|      |-- ImportMerchants.php
+|      |-- ImportOrders.php
+|      `-- Summary.php
+|   
+|-- Contracts
+|   |-- AdditionalFeeInterface.php
+|   |-- DisbursementRepositoryInterface.php
+|   |-- FileDownloaderInterface.php
+|   |-- MerchantImporterInterface.php
+|   |-- MerchantRepositoryInterface.php
+|   |-- OrderImporterInterface.php
+|   `-- OrderRepositoryInterface.php
+|-- DTOs
+|   |-- AdditionalFeeData.php
+|   |-- DisbursementData.php
+|   |-- MerchantData.php
+|   `-- OrderData.php
+|-- Models
+|   |-- AdditionalFee.php
+|   |-- Disbursement.php
+|   |-- Merchant.php
+|   `-- Order.php
+|-- Providers
+|   `-- AppServiceProvider.php
+|-- Repositories
+|   |-- EloquentAdditionalFeeRepository.php
+|   |-- EloquentDisbursementRepository.php
+|   |-- EloquentMerchantRepository.php
+|   `-- EloquentOrderRepository.php
+`-- Services
+    |-- CsvReader.php
+    |-- CurlFileDownloader.php
+    |-- DisbursementService.php
+    |-- MerchantDataTransformer.php
+    |-- MerchantImporterFromCsv.php
+    |-- OrderDataTransformer.php
+    `-- OrderImporterFromCsv.php
+````
+El resultado del análisis de sonarqube
 
-## Learning Laravel
+# TODO: Captura de sonarqube
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## Seguridad y Trazabilidad:
+- Creación de cuatro tablas en la base de datos: disbursements, merchants, additional_fees y orders.
+- Añadidos campos técnicos en tablas orders y merchants para trazabilidad (ingest_date, source).
+- Reemplazo de id del CSV por external_id en tablas orders y merchants, con id local como primary key.
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+## Rendimiento y Manejo de Datos:
+- Optimización del rendimiento mediante la lectura del CSV de merchants a través de la red.
+- Descarga por partes del CSV de pedidos para evitar timeouts.
+- Importación de un millón de pedidos en ~6-7 minutos en MacBook M1 Pro 2021 (16GB RAM, 1GB de memoria para PHP).
+- Registro de pedidos con datos erróneos en el log de Laravel.
+- No se verifica la existencia del merchant en cada pedido importado para mejorar el rendimiento.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 2000 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Decisiones de Diseño y Arquitectura:
+- Elección de Laravel por similitud con Ruby on Rails y enfoque en código limpio y bien testeado siguiendo principios SOLID.
+- Uso de modelos anémicos y traslado de la lógica a los servicios, evitando romper la filosofía del framework.
 
-## Laravel Sponsors
+## Manejo de Repositorios y Tablas:
+- Diseño de repositorios y tablas para prevenir la inserción de registros duplicados.
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+## Errores y Excepciones:
+- Identificación de 8 pedidos con errores durante el proceso de importación.
 
-### Premium Partners
+## El proceso para cada comerciante es el siguiente:
+* Verificamos si es elegible para desembolso en función del día en el que se está ejecutando el comando, en caso afirmativo:
+    * Recuperamos los pedidos para un rango de fechas, del día anterior o de la semana anterior
+    * Para cada orden:
+        * Calculamos la comisión
+        * Lo marcamos como pagado
+    * Hacemos el cálculo de si ha llegado o no al mínimo de comisión y lo guardamos
+    * Guardamos el desembolso total para las N ordenes previamente recuperadas
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+## Resultados:
+El proceso total (instalación, importación, generación y obtención de datos) se ejecuta en ~9,5 minutos en un MacBook M1 Pro 2021 (16GB RAM, 1GB límite de memoria para PHP).
 
-## Contributing
+````
++------+-------------------------+-------------------------------+----------------------+--------------------------------+-------------------------------+
+| Year | Number of Disbursements | Amount Disbursed to Merchants | Amount of Order Fees | Number of Monthly Fees Charged | Amount of Monthly Fee Charged |
++------+-------------------------+-------------------------------+----------------------+--------------------------------+-------------------------------+
+| 2022 | 159                     | 358.382,16 €                  | 3.462,13 €           | 1                              | 25,83 €                       |
+| 2023 | 1648                    | 3.653.564,66 €                | 33.600,84 €          | 18                             | 206,95 €                      |
++------+-------------------------+-------------------------------+----------------------+--------------------------------+-------------------------------+
+````
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+## Puntos de mejora:
+- Mejorar test e implementar Behat para prevenir regresiones y garantizar el escalado del proyecto.
+- Multi hilo para mejorar el rendimiento de las importaciones y las demás operaciones.
+- Refactorizar las clases Summary y DisbursementService para respetar los principios solid (sobre todo encapsular responsabilidades.
+- Eliminar ejemplos y esqueleto de Laravel.
+- El diseño de las tablas es mejorable, se ha hecho de esta mañana para no tardar demasiado tiempo, el precio a pagar ha sido una única query "complicada".
+- Opcional: Tal vez se podrían crear subdirectorios dentro de Services y Contracts para organizar mejor los archivos pero al haber tan pocos no lo he visto necesario.
 
-## Code of Conduct
+## Archivos .env .env.test
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+- .env
+ ````
+APP_NAME=sequra-challenge
+APP_ENV=local
+APP_KEY=base64:14NOgsi734l+5JPH7J3V9KHsP2Ky8uq9k//IcxiXqr0=
+APP_DEBUG=true
+APP_URL=http://localhost
 
-## Security Vulnerabilities
+LOG_CHANNEL=stack
+LOG_DEPRECATIONS_CHANNEL=null
+LOG_LEVEL=debug
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+DB_CONNECTION=pgsql
+DB_HOST=db
+DB_PORT=5432
+DB_DATABASE=sequra_db
+DB_USERNAME=sequra_user
+DB_PASSWORD=password
 
-## License
+BROADCAST_DRIVER=log
+CACHE_DRIVER=file
+FILESYSTEM_DISK=local
+QUEUE_CONNECTION=sync
+SESSION_DRIVER=file
+SESSION_LIFETIME=120
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+MEMCACHED_HOST=127.0.0.1
+
+REDIS_HOST=127.0.0.1
+REDIS_PASSWORD=null
+REDIS_PORT=6379
+
+MAIL_MAILER=smtp
+MAIL_HOST=mailpit
+MAIL_PORT=1025
+MAIL_USERNAME=null
+MAIL_PASSWORD=null
+MAIL_ENCRYPTION=null
+MAIL_FROM_ADDRESS="hello@example.com"
+MAIL_FROM_NAME="${APP_NAME}"
+
+AWS_ACCESS_KEY_ID=
+AWS_SECRET_ACCESS_KEY=
+AWS_DEFAULT_REGION=us-east-1
+AWS_BUCKET=
+AWS_USE_PATH_STYLE_ENDPOINT=false
+
+PUSHER_APP_ID=
+PUSHER_APP_KEY=
+PUSHER_APP_SECRET=
+PUSHER_HOST=
+PUSHER_PORT=443
+PUSHER_SCHEME=https
+PUSHER_APP_CLUSTER=mt1
+
+VITE_APP_NAME="${APP_NAME}"
+VITE_PUSHER_APP_KEY="${PUSHER_APP_KEY}"
+VITE_PUSHER_HOST="${PUSHER_HOST}"
+VITE_PUSHER_PORT="${PUSHER_PORT}"
+VITE_PUSHER_SCHEME="${PUSHER_SCHEME}"
+VITE_PUSHER_APP_CLUSTER="${PUSHER_APP_CLUSTER}"
+
+MERCHANTS_CSV_URL="https://sequra.github.io/backend-challenge/merchants.csv"
+ORDERS_CSV_URL="https://sequra.github.io/backend-challenge/orders.csv"
+````
+- .env.test
+````
+APP_NAME=sequra-challenge
+APP_ENV=local
+APP_KEY=base64:14NOgsi734l+5JPH7J3V9KHsP2Ky8uq9k//IcxiXqr0=
+APP_DEBUG=true
+APP_URL=http://localhost
+
+LOG_CHANNEL=stack
+LOG_DEPRECATIONS_CHANNEL=null
+LOG_LEVEL=debug
+
+DB_CONNECTION=pgsql
+DB_HOST=db-test
+DB_PORT=5432
+DB_DATABASE=sequra_db_test
+DB_USERNAME=sequra_user_test
+DB_PASSWORD=password
+
+BROADCAST_DRIVER=log
+CACHE_DRIVER=file
+FILESYSTEM_DISK=local
+QUEUE_CONNECTION=sync
+SESSION_DRIVER=file
+SESSION_LIFETIME=120
+
+MEMCACHED_HOST=127.0.0.1
+
+REDIS_HOST=127.0.0.1
+REDIS_PASSWORD=null
+REDIS_PORT=6379
+
+MAIL_MAILER=smtp
+MAIL_HOST=mailpit
+MAIL_PORT=1025
+MAIL_USERNAME=null
+MAIL_PASSWORD=null
+MAIL_ENCRYPTION=null
+MAIL_FROM_ADDRESS="hello@example.com"
+MAIL_FROM_NAME="${APP_NAME}"
+
+AWS_ACCESS_KEY_ID=
+AWS_SECRET_ACCESS_KEY=
+AWS_DEFAULT_REGION=us-east-1
+AWS_BUCKET=
+AWS_USE_PATH_STYLE_ENDPOINT=false
+
+PUSHER_APP_ID=
+PUSHER_APP_KEY=
+PUSHER_APP_SECRET=
+PUSHER_HOST=
+PUSHER_PORT=443
+PUSHER_SCHEME=https
+PUSHER_APP_CLUSTER=mt1
+
+VITE_APP_NAME="${APP_NAME}"
+VITE_PUSHER_APP_KEY="${PUSHER_APP_KEY}"
+VITE_PUSHER_HOST="${PUSHER_HOST}"
+VITE_PUSHER_PORT="${PUSHER_PORT}"
+VITE_PUSHER_SCHEME="${PUSHER_SCHEME}"
+VITE_PUSHER_APP_CLUSTER="${PUSHER_APP_CLUSTER}"
+
+MERCHANTS_CSV_URL="/var/www/tests/Data/merchants.csv"
+````
