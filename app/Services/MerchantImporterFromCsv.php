@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Services;
 
 use App\Contracts\MerchantImporterInterface;
@@ -10,18 +11,17 @@ class MerchantImporterFromCsv implements MerchantImporterInterface
         private CsvReader $csvReader,
         private MerchantRepositoryInterface $merchantRepository,
         private MerchantDataTransformer $merchantDataTransformer,
-    ){
+    ) {
     }
 
     public function import(string $file): void
     {
         array_map(
-            fn($merchant) => $this->merchantRepository->insert($merchant),
+            fn ($merchant) => $this->merchantRepository->insert($merchant),
             array_map(
-                fn($merchant) => $this->merchantDataTransformer->transform($merchant),
+                fn ($merchant) => $this->merchantDataTransformer->transform($merchant),
                 $this->csvReader->readCsvFromFile($file)
             )
         );
     }
 }
-

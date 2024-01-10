@@ -27,8 +27,7 @@ final class MerchantData
         float $minimum_monthly_fee,
         DateTimeInterface $ingest_date,
         string $origin,
-    ) : self
-    {
+    ) : self {
         return new self(
             $external_id,
             $reference,
@@ -58,14 +57,14 @@ final class MerchantData
     public static function fromArray(array $merchantData): self
     {
         return self::build(
-            $merchantData["external_id"],
-            $merchantData["reference"],
-            $merchantData["email"],
-            $merchantData["live_on"],
-            $merchantData["disbursement_frequency"],
-            $merchantData["minimum_monthly_fee"],
-            $merchantData["ingest_date"],
-            $merchantData["origin"]
+            $merchantData['external_id'],
+            $merchantData['reference'],
+            $merchantData['email'],
+            $merchantData['live_on'],
+            $merchantData['disbursement_frequency'],
+            $merchantData['minimum_monthly_fee'],
+            $merchantData['ingest_date'],
+            $merchantData['origin']
         );
     }
 }

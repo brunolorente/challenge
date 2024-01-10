@@ -29,4 +29,3 @@ class CsvReaderTest extends TestCase
         $this->assertCount(50, $result);
     }
 }
-

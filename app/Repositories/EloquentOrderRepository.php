@@ -10,7 +10,6 @@ use Ramsey\Uuid\UuidInterface;
 
 class EloquentOrderRepository implements OrderRepositoryInterface
 {
-
     public function insert(OrderData $orderData): bool
     {
         $order = new Order($orderData->toArray());
@@ -18,6 +17,7 @@ class EloquentOrderRepository implements OrderRepositoryInterface
             return $order->save();
         } catch (\Exception $e) {
             Log::error(sprintf("Error inserting order with data: %s \n Error message: %s", json_encode($orderData), $e->getMessage()));
+
             return false;
         }
     }
@@ -29,12 +29,11 @@ class EloquentOrderRepository implements OrderRepositoryInterface
 
     public function updateOrderAsDisbursed(UuidInterface $uuid): bool
     {
-
         //try {
-            return Order::findOrFail($uuid->toString())->update(["disbursed" => true]);
+        return Order::findOrFail($uuid->toString())->update(['disbursed' => true]);
         //} catch (\Exception $e) {
         //    Log::error(sprintf("Error updating order status id: %s \n Error message: %s", $uuid->toString(), $e->getMessage()));
-         //   return false;
+        //   return false;
         //}
     }
 }

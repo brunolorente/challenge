@@ -17,6 +17,7 @@ class EloquentDisbursementRepository implements DisbursementRepositoryInterface
             return $disbursement->save();
         } catch (\Exception $e) {
             Log::error(sprintf("Error inserting disbursement with data: %s \n Error message: %s", json_encode($disbursementData), $e->getMessage()));
+
             return false;
         }
     }

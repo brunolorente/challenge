@@ -4,8 +4,10 @@ namespace App\Services;
 
 use App\Contracts\FileDownloaderInterface;
 
-class CurlFileDownloader implements FileDownloaderInterface {
-    public function download(string $url, int $start, int $end): bool|string {
+class CurlFileDownloader implements FileDownloaderInterface
+{
+    public function download(string $url, int $start, int $end): bool|string
+    {
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_RANGE, "$start-$end");
@@ -17,4 +19,3 @@ class CurlFileDownloader implements FileDownloaderInterface {
         return $result;
     }
 }
-

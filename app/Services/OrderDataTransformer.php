@@ -16,12 +16,12 @@ final class OrderDataTransformer
 
     private function sanitizeData(array $orderData) : array
     {
-        $orderData["ingest_date"] = DateTime::createFromFormat('Y-m-d h:i:s', date('Y-m-d h:i:s'));
-        $orderData["origin"] = "csv";
-        $orderData["external_id"] = $orderData["id"];
-        $orderData["created_at"] = new DateTime($orderData["created_at"]);
+        $orderData['ingest_date'] = DateTime::createFromFormat('Y-m-d h:i:s', date('Y-m-d h:i:s'));
+        $orderData['origin'] = 'csv';
+        $orderData['external_id'] = $orderData['id'];
+        $orderData['created_at'] = new DateTime($orderData['created_at']);
 
-        unset($orderData["id"]);
+        unset($orderData['id']);
 
         return $orderData;
     }

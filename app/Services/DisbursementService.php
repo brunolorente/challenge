@@ -18,14 +18,15 @@ use Ramsey\Uuid\UuidInterface;
 class DisbursementService
 {
     private DateTimeInterface $start;
+
     private DateTimeInterface $end;
 
     public function __construct(
-        private MerchantRepositoryInterface      $merchantRepository,
-        private OrderRepositoryInterface         $orderRepository,
-        private DisbursementRepositoryInterface  $disbursementRepository,
+        private MerchantRepositoryInterface $merchantRepository,
+        private OrderRepositoryInterface $orderRepository,
+        private DisbursementRepositoryInterface $disbursementRepository,
         private AdditionalFeeRepositoryInterface $additionalFeeRepository,
-    ){
+    ) {
     }
 
     public function calculateDisbursements(Carbon $date): void
@@ -35,7 +36,7 @@ class DisbursementService
         foreach ($merchants as $merchant) {
             if ($this->isEligibleForDisbursement($merchant, $date)) {
                 $orders = $this->getEligibleOrders($merchant, $merchant->disbursement_frequency, $date);
-                if(count($orders) > 0) {
+                if (count($orders) > 0) {
                     $this->processDisbursement($merchant, $orders, $date);
                 }
             }
@@ -126,7 +127,7 @@ class DisbursementService
         if ($frequency == 'DAILY') {
             $this->start = $date->copy()->startOfDay();
             $this->end = $date->copy()->endOfDay();
-        } else if ($frequency == 'WEEKLY') {
+        } elseif ($frequency == 'WEEKLY') {
             $this->start = $date->copy()->startOfWeek();
             $this->end = $date->copy()->endOfDay();
         }

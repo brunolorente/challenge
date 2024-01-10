@@ -11,7 +11,6 @@ use Ramsey\Uuid\UuidInterface;
 
 class EloquentMerchantRepository implements MerchantRepositoryInterface
 {
-
     public function insert(MerchantData $merchantData): bool
     {
         $merchant = new Merchant($merchantData->toArray());
@@ -19,6 +18,7 @@ class EloquentMerchantRepository implements MerchantRepositoryInterface
             $merchant->save();
         } catch (\Exception $e) {
             Log::error(sprintf("Error inserting merchant with data: %s \n Error message: %s", json_encode($merchantData), $e->getMessage()));
+
             return false;
         }
 

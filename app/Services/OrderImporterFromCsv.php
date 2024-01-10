@@ -16,7 +16,7 @@ class OrderImporterFromCsv implements OrderImporterInterface
         private CsvReader $csvReader,
         private FileDownloaderInterface $fileDownloader,
         private OrderDataTransformer $dataTransformer,
-    ){
+    ) {
     }
 
     public function import(string $file): void
@@ -32,13 +32,13 @@ class OrderImporterFromCsv implements OrderImporterInterface
         while (true) {
             $data = $this->downloadDataPartials($start, $file, $previousExtraData);
             $previousExtraData = '';
-            list($data, $previousExtraData)  = $this->findLastCompleteRowInDownloadedPartial($data, $previousExtraData);
+            list($data, $previousExtraData) = $this->findLastCompleteRowInDownloadedPartial($data, $previousExtraData);
 
             if (empty($data)) {
                 break;
             }
 
-            array_map(fn($order) => $this->persistOrder($order), $this->csvReader->readCsvFromFileParts($data, $start === 0));
+            array_map(fn ($order) => $this->persistOrder($order), $this->csvReader->readCsvFromFileParts($data, $start === 0));
             $start += self::CHUNK_SIZE;
         }
     }
@@ -48,7 +48,7 @@ class OrderImporterFromCsv implements OrderImporterInterface
         $end = $start + self::CHUNK_SIZE;
         $data = $this->fileDownloader->download($file, $start, $end);
 
-        return $previousExtraData . $data;
+        return $previousExtraData.$data;
     }
 
     private function findLastCompleteRowInDownloadedPartial(string $dataUntilLastCompleteRow, string $incompleteDataForNextIteration): array
@@ -61,7 +61,7 @@ class OrderImporterFromCsv implements OrderImporterInterface
 
         return [
             $dataUntilLastCompleteRow,
-            $incompleteDataForNextIteration
+            $incompleteDataForNextIteration,
         ];
     }
 

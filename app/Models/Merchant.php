@@ -12,9 +12,11 @@ class Merchant extends Model
     use HasFactory;
 
     public $timestamps = false;
+
     public $incrementing = false;
 
     protected $keyType = 'string';
+
     protected $fillable = [
         'external_id',
         'reference',
@@ -38,6 +40,6 @@ class Merchant extends Model
 
     public function orders(): HasMany
     {
-        return $this->hasMany(Order::class, "merchant_reference", "reference");
+        return $this->hasMany(Order::class, 'merchant_reference', 'reference');
     }
 }

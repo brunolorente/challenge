@@ -4,9 +4,9 @@ namespace Feature\Services;
 
 use App\Models\AdditionalFee;
 use App\Models\Disbursement;
-use App\Services\DisbursementService;
 use App\Models\Merchant;
 use App\Models\Order;
+use App\Services\DisbursementService;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -22,7 +22,6 @@ class DisbursementServiceTest extends TestCase
         $this->generateMerchants();
         $this->generateOrders();
     }
-
 
     public function testCalculateDisbursementsForDailyMerchant(): void
     {
@@ -61,7 +60,6 @@ class DisbursementServiceTest extends TestCase
             $total += $disbursement->nb_of_orders;
         }
         $this->assertEquals(3, $total); // this is just 3 because the orders for the daily merchant are for other date
-
     }
 
     public function testCalculateDisbursementsWithAmountOfMonthlyFeeCharged(): void
@@ -97,16 +95,13 @@ class DisbursementServiceTest extends TestCase
 
     private function generateOrders(): void
     {
-        foreach (Order::factory(1)->dailyMerchantOrders() as $order)
-        {
+        foreach (Order::factory(1)->dailyMerchantOrders() as $order) {
             $order->save();
         }
-        foreach (Order::factory(1)->weeklyMerchantOrders() as $order)
-        {
+        foreach (Order::factory(1)->weeklyMerchantOrders() as $order) {
             $order->save();
         }
-        foreach (Order::factory(1)->poorMerchantOrders() as $order)
-        {
+        foreach (Order::factory(1)->poorMerchantOrders() as $order) {
             $order->save();
         }
     }

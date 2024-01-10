@@ -2,6 +2,7 @@
 
 namespace App\Contracts;
 
-interface FileDownloaderInterface {
+interface FileDownloaderInterface
+{
     public function download(string $url, int $start, int $end): bool|string;
 }

@@ -10,6 +10,7 @@ class Disbursement extends Model
     public $incrementing = false;
 
     protected $keyType = 'string';
+
     protected $fillable = [
         'amount',
         'merchant_id',

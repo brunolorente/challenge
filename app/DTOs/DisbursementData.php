@@ -5,7 +5,8 @@ namespace App\DTOs;
 use DateTimeInterface;
 use Ramsey\Uuid\UuidInterface;
 
-class DisbursementData{
+class DisbursementData
+{
     private function __construct(
         private float $amount,
         private UuidInterface $merchant_id,
@@ -25,8 +26,7 @@ class DisbursementData{
         DateTimeInterface $orders_end,
         UuidInterface $reference,
         int $nbOfOrders,
-    ) : self
-    {
+    ) : self {
         return new self(
             $amount,
             $merchant_id,
@@ -54,13 +54,13 @@ class DisbursementData{
     public static function fromArray(array $disbursementData): self
     {
         return self::build(
-            $disbursementData["amount"],
-            $disbursementData["merchant_id"],
-            $disbursementData["commission"],
-            $disbursementData["orders_start"],
-            $disbursementData["orders_end"],
-            $disbursementData["reference"],
-            $disbursementData["nb_of_orders"],
+            $disbursementData['amount'],
+            $disbursementData['merchant_id'],
+            $disbursementData['commission'],
+            $disbursementData['orders_start'],
+            $disbursementData['orders_end'],
+            $disbursementData['reference'],
+            $disbursementData['nb_of_orders'],
         );
     }
 }

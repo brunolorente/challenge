@@ -23,8 +23,7 @@ final class OrderData
         DateTimeInterface $created_at,
         DateTimeInterface $ingest_date,
         string $origin,
-    ) : self
-    {
+    ) : self {
         return new self(
             $external_id,
             $merchant_reference,
@@ -50,12 +49,12 @@ final class OrderData
     public static function fromArray(array $orderData): self
     {
         return self::build(
-            $orderData["external_id"],
-            $orderData["merchant_reference"],
-            $orderData["amount"],
-            $orderData["created_at"],
-            $orderData["ingest_date"],
-            $orderData["origin"]
+            $orderData['external_id'],
+            $orderData['merchant_reference'],
+            $orderData['amount'],
+            $orderData['created_at'],
+            $orderData['ingest_date'],
+            $orderData['origin']
         );
     }
 }

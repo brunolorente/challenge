@@ -11,6 +11,7 @@ use PHPUnit\Framework\TestCase;
 class MerchantImporterFromCsvTest extends TestCase
 {
     private CsvReader $csvReader;
+
     private MerchantImporterFromCsv $merchantImporterFromCsv;
 
     protected function setUp(): void
@@ -34,4 +35,3 @@ class MerchantImporterFromCsvTest extends TestCase
         $this->merchantImporterFromCsv->import('/var/www/tests/Data/merchants.csv');
     }
 }
-

@@ -38,6 +38,7 @@ class GenerateDisbursements extends Command
             $date = Carbon::createFromFormat('Y-m-d', $this->argument('date'));
         } catch (Exception $e) {
             $this->error('Invalid date format. Please use Y-m-d.');
+
             return;
         }
 

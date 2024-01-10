@@ -18,8 +18,7 @@ class AdditionalFeeData
         float $fee,
         UuidInterface $merchant_id,
         DateTimeInterface $date,
-    ) : self
-    {
+    ) : self {
         return new self(
             $fee,
             $merchant_id,
@@ -39,9 +38,9 @@ class AdditionalFeeData
     public static function fromArray(array $feeData): self
     {
         return self::build(
-            $feeData["fee"],
-            $feeData["merchant_id"],
-            $feeData["date"],
+            $feeData['fee'],
+            $feeData['merchant_id'],
+            $feeData['date'],
         );
     }
 }

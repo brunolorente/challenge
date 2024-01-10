@@ -16,6 +16,7 @@ class EloquentAdditionalFeeRepositoryRepository implements AdditionalFeeReposito
             return $fee->save();
         } catch (\Exception $e) {
             Log::error(sprintf("Error inserting additional fee with data: %s \n Error message: %s", json_encode($feeData), $e->getMessage()));
+
             return false;
         }
     }

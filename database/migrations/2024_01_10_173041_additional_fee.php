@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -13,7 +12,7 @@ return new class extends Migration
     {
         Schema::create('additional_fees', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->float('fee',9, 2);
+            $table->float('fee', 9, 2);
             $table->dateTime('date');
             $table->uuid('merchant_id');
 

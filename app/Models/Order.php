@@ -11,9 +11,11 @@ class Order extends Model
     use HasFactory;
 
     public $timestamps = false;
+
     public $incrementing = false;
 
     protected $keyType = 'string';
+
     protected $fillable = [
         'external_id',
         'merchant_reference',

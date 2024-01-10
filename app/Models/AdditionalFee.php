@@ -10,6 +10,7 @@ class AdditionalFee extends Model
     public $incrementing = false;
 
     protected $keyType = 'string';
+
     protected $fillable = [
         'fee',
         'merchant_id',

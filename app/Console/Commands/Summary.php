@@ -40,17 +40,17 @@ class Summary extends Command
             'Amount Disbursed to Merchants',
             'Amount of Order Fees',
             'Number of Monthly Fees Charged',
-            'Amount of Monthly Fee Charged'
+            'Amount of Monthly Fee Charged',
         ];
 
         $data = collect($results)->map(function ($item) {
             return [
                 $item->year,
                 $item->number_of_disbursements,
-                number_format(round($item->amount_disbursed_to_merchants, 2), 2, ',', '.') . ' €',
-                number_format(round($item->amount_of_order_fees, 2), 2, ',', '.') . ' €',
+                number_format(round($item->amount_disbursed_to_merchants, 2), 2, ',', '.').' €',
+                number_format(round($item->amount_of_order_fees, 2), 2, ',', '.').' €',
                 $item->number_of_monthly_fees_charged,
-                number_format(round($item->amount_of_monthly_fee_charged, 2), 2, ',', '.') . ' €'
+                number_format(round($item->amount_of_monthly_fee_charged, 2), 2, ',', '.').' €',
             ];
         })->toArray();
 

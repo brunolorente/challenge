@@ -32,6 +32,6 @@ class ImportOrders extends Command
      */
     public function handle()
     {
-        $this->orderImporter->import(getenv("ORDERS_CSV_URL"));
+        $this->orderImporter->import(getenv('ORDERS_CSV_URL'));
     }
 }

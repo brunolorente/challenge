@@ -19,7 +19,9 @@ class ImportMerchantsTest extends TestCase
     use RefreshDatabase, CreatesApplication;
 
     private Application $app;
+
     private MerchantRepositoryInterface|MockObject $merchantRepositoryMock;
+
     private MerchantImporterFromCsv $merchantImporter;
 
     protected function setUp(): void
@@ -49,4 +51,3 @@ class ImportMerchantsTest extends TestCase
         $this->assertEquals(0, $status);
     }
 }
-

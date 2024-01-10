@@ -2,8 +2,8 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
 use App\Contracts\MerchantImporterInterface;
+use Illuminate\Console\Command;
 
 class ImportMerchants extends Command
 {
@@ -32,6 +32,6 @@ class ImportMerchants extends Command
      */
     public function handle()
     {
-        $this->merchantImporter->import(getenv("MERCHANTS_CSV_URL"));
+        $this->merchantImporter->import(getenv('MERCHANTS_CSV_URL'));
     }
 }
