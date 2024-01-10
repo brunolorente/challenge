@@ -4,7 +4,6 @@ namespace App\Console\Commands;
 
 use App\Contracts\DisbursementRepositoryInterface;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\DB;
 
 class Summary extends Command
 {
@@ -48,10 +47,10 @@ class Summary extends Command
             return [
                 $item->year,
                 $item->number_of_disbursements,
-                number_format($item->amount_disbursed_to_merchants, 2, ',', '.') . ' €',
-                number_format($item->amount_of_order_fees, 2, ',', '.') . ' €',
-                "TODO",//$item->number_of_monthly_fees_charged,
-                "TODO",//number_format($item->amount_of_monthly_fee_charged, 2, ',', '.') . ' €'
+                number_format(round($item->amount_disbursed_to_merchants, 2), 2, ',', '.') . ' €',
+                number_format(round($item->amount_of_order_fees, 2), 2, ',', '.') . ' €',
+                $item->number_of_monthly_fees_charged,
+                number_format(round($item->amount_of_monthly_fee_charged, 2), 2, ',', '.') . ' €'
             ];
         })->toArray();
 

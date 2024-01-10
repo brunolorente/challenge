@@ -12,10 +12,9 @@ help:
 	@echo "  \033[1;34mstatus\033[0m        📊 Displays the status of the docker containers."
 	@echo "  \033[1;34mdestroy\033[0m       💥 Destroys the docker containers and volumes."
 	@echo "  \033[1;34mbuild\033[0m         🔧 Builds the docker images and starts the containers."
-	@echo "  \033[1;34murls\033[0m          🌐 Shows the available URLs."
 	@echo "  \033[1;34mssh-php\033[0m       💻 SSH into the PHP container."
 	@echo "  \033[1;34mtests\033[0m         🧪 Runs the Laravel tests."
-	@echo "  \033[1;34mmigrate\033[0m       🗃️  Runs the database migrations."
+	@echo "  \033[1;34mmigrate\033[0m       🗃️ Runs the database migrations."
 	@echo "  \033[1;34mgenerate-data\033[0m 📈 Generates dummy data."
 	@echo "  \033[1;34mhelp\033[0m          🆘 Displays this help message."
 
