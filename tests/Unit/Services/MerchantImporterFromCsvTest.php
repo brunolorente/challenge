@@ -32,6 +32,6 @@ class MerchantImporterFromCsvTest extends TestCase
         $this->mockRepository->expects(self::exactly(50))->method('insert');
 
         // when
-        $this->merchantImporterFromCsv->import('/var/www/tests/Data/merchants.csv');
+        $this->merchantImporterFromCsv->import('/var/www/tests/fixtures/merchants.csv');
     }
 }

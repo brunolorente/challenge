@@ -3,15 +3,14 @@
 ## Requisitos:
 - Docker
 - Docker Compose
-- No editar .env ni .env.test
+- Don't edit .env or .env.test
 
-## Uso:
-- En una CLI, ubicarnos dentro del directorio `challenge` y ejecutar el comando `make build`.
+## Usage:
+In a CLI, navigate to the `challenge` directory and execute the `make build` command
+##### The process will run the necessary Docker containers for the project, import the data, execute the challenge processes, and display a table with the results.
 
-##### El proceso ejecutará los contenedores de Docker necesarios para el proyecto, importará los datos, ejecutará los procesos del challenge y mostrará una tabla con los resultados.
-
-## Código:
-El código utilizado para la prueba (sin contar tests, migraciones, e infraestructura):
+## Code:
+The code used for the challenge (not including tests, migrations, and infrastructure)::
 
 ````
 app
@@ -56,189 +55,58 @@ app
     |-- OrderDataTransformer.php
     `-- OrderImporterFromCsv.php
 ````
-El resultado del análisis de sonarqube
+The result of the SonarQube analysis
+![sonar report](./sonar.png)
+> Smells and tech debt are from naming conventions and some framework files, the code coverage could be improved with more tests (I don'w know why but Sonar also includes for coverage calculation the tests files code, real coverage is higher).
 
-# TODO: Captura de sonarqube
+## Security and Traceability:
+- Creation of four tables in the database: disbursements, merchants, additional_fees, and orders.
+- Addition of technical fields in the orders and merchants tables for traceability (ingest_date, source).
+- Replacement of the CSV id with external_id in the orders and merchants tables, with a local id as the primary key.
 
-## Seguridad y Trazabilidad:
-- Creación de cuatro tablas en la base de datos: disbursements, merchants, additional_fees y orders.
-- Añadidos campos técnicos en tablas orders y merchants para trazabilidad (ingest_date, source).
-- Reemplazo de id del CSV por external_id en tablas orders y merchants, con id local como primary key.
+## Performance and data handling:
+- Performance optimization by reading the merchants CSV over the network.
+- Part-by-part download of the orders CSV to avoid timeouts.
+- Import of more than one million orders in ~6-7 minutes on a 2021 MacBook M1 Pro (16GB RAM, 1GB memory for PHP).
+- Logging of orders with erroneous data in the Laravel log.
+- The existence of the merchant is not verified in each imported order to improve performance..
 
-## Rendimiento y Manejo de Datos:
-- Optimización del rendimiento mediante la lectura del CSV de merchants a través de la red.
-- Descarga por partes del CSV de pedidos para evitar timeouts.
-- Importación de un millón de pedidos en ~6-7 minutos en MacBook M1 Pro 2021 (16GB RAM, 1GB de memoria para PHP).
-- Registro de pedidos con datos erróneos en el log de Laravel.
-- No se verifica la existencia del merchant en cada pedido importado para mejorar el rendimiento.
+## Design and architecture decisions:
+- Choice of Laravel due to its similarity with Ruby on Rails and focus on clean, well-tested code following SOLID principles.
+- Use of anemic models and moving logic to services, avoiding breaking the philosophy of the framework.
 
-## Decisiones de Diseño y Arquitectura:
-- Elección de Laravel por similitud con Ruby on Rails y enfoque en código limpio y bien testeado siguiendo principios SOLID.
-- Uso de modelos anémicos y traslado de la lógica a los servicios, evitando romper la filosofía del framework.
+## Repositories and tables management:
+- Design of repositories and tables addressed to prevent the insertion of duplicate records.
 
-## Manejo de Repositorios y Tablas:
-- Diseño de repositorios y tablas para prevenir la inserción de registros duplicados.
+## Errors and exceptions:
+- Identification of 8 orders with errors during the import process.
 
-## Errores y Excepciones:
-- Identificación de 8 pedidos con errores durante el proceso de importación.
+## The process for each merchant is as follows:
+* We check if they are eligible for disbursement based on the day the command is being executed, if so:
+    * We retrieve orders (not disbursed) for a date range, either from the previous day or from the start of the week corresponding to the previous day
+    * For each order:
+        * We calculate the commission
+        * We mark it as paid
+    * We calculate whether the minimum commission amount has been reached and save it
+    * We save the total disbursement for the N orders previously retrieved
+    * If it is the first day of the month, we calculate if the merchant has reached the minimum and save the difference if it exists
 
-## El proceso para cada comerciante es el siguiente:
-* Verificamos si es elegible para desembolso en función del día en el que se está ejecutando el comando, en caso afirmativo:
-    * Recuperamos los pedidos para un rango de fechas, del día anterior o de la semana anterior
-    * Para cada orden:
-        * Calculamos la comisión
-        * Lo marcamos como pagado
-    * Hacemos el cálculo de si ha llegado o no al mínimo de comisión y lo guardamos
-    * Guardamos el desembolso total para las N ordenes previamente recuperadas
-
-## Resultados:
-El proceso total (instalación, importación, generación y obtención de datos) se ejecuta en ~9,5 minutos en un MacBook M1 Pro 2021 (16GB RAM, 1GB límite de memoria para PHP).
+## Results:
+The total process (installation, importation, generation, and data retrieval) runs in ~9.5 minutes on a 2021 MacBook M1 Pro (16GB RAM, 1GB memory limit for PHP).
 
 ````
 +------+-------------------------+-------------------------------+----------------------+--------------------------------+-------------------------------+
 | Year | Number of Disbursements | Amount Disbursed to Merchants | Amount of Order Fees | Number of Monthly Fees Charged | Amount of Monthly Fee Charged |
 +------+-------------------------+-------------------------------+----------------------+--------------------------------+-------------------------------+
-| 2022 | 159                     | 358.382,16 €                  | 3.462,13 €           | 1                              | 25,83 €                       |
-| 2023 | 1648                    | 3.653.564,66 €                | 33.600,84 €          | 18                             | 206,95 €                      |
+| 2022 | 120                     | 75.732,91  €                  | 725,37 €             | 2                              | 22,01 €                       |
+| 2023 | 1252                    | 2.650.626,60 €                | 23.894,26 €          | 16                             | 159,17 €                      |
 +------+-------------------------+-------------------------------+----------------------+--------------------------------+-------------------------------+
 ````
 
-## Puntos de mejora:
-- Mejorar test e implementar Behat para prevenir regresiones y garantizar el escalado del proyecto.
-- Multi hilo para mejorar el rendimiento de las importaciones y las demás operaciones.
-- Refactorizar las clases Summary y DisbursementService para respetar los principios solid (sobre todo encapsular responsabilidades.
-- Eliminar ejemplos y esqueleto de Laravel.
-- El diseño de las tablas es mejorable, se ha hecho de esta mañana para no tardar demasiado tiempo, el precio a pagar ha sido una única query "complicada".
-- Opcional: Tal vez se podrían crear subdirectorios dentro de Services y Contracts para organizar mejor los archivos pero al haber tan pocos no lo he visto necesario.
-
-## Archivos .env .env.test
-
-- .env
- ````
-APP_NAME=sequra-challenge
-APP_ENV=local
-APP_KEY=base64:14NOgsi734l+5JPH7J3V9KHsP2Ky8uq9k//IcxiXqr0=
-APP_DEBUG=true
-APP_URL=http://localhost
-
-LOG_CHANNEL=stack
-LOG_DEPRECATIONS_CHANNEL=null
-LOG_LEVEL=debug
-
-DB_CONNECTION=pgsql
-DB_HOST=db
-DB_PORT=5432
-DB_DATABASE=sequra_db
-DB_USERNAME=sequra_user
-DB_PASSWORD=password
-
-BROADCAST_DRIVER=log
-CACHE_DRIVER=file
-FILESYSTEM_DISK=local
-QUEUE_CONNECTION=sync
-SESSION_DRIVER=file
-SESSION_LIFETIME=120
-
-MEMCACHED_HOST=127.0.0.1
-
-REDIS_HOST=127.0.0.1
-REDIS_PASSWORD=null
-REDIS_PORT=6379
-
-MAIL_MAILER=smtp
-MAIL_HOST=mailpit
-MAIL_PORT=1025
-MAIL_USERNAME=null
-MAIL_PASSWORD=null
-MAIL_ENCRYPTION=null
-MAIL_FROM_ADDRESS="hello@example.com"
-MAIL_FROM_NAME="${APP_NAME}"
-
-AWS_ACCESS_KEY_ID=
-AWS_SECRET_ACCESS_KEY=
-AWS_DEFAULT_REGION=us-east-1
-AWS_BUCKET=
-AWS_USE_PATH_STYLE_ENDPOINT=false
-
-PUSHER_APP_ID=
-PUSHER_APP_KEY=
-PUSHER_APP_SECRET=
-PUSHER_HOST=
-PUSHER_PORT=443
-PUSHER_SCHEME=https
-PUSHER_APP_CLUSTER=mt1
-
-VITE_APP_NAME="${APP_NAME}"
-VITE_PUSHER_APP_KEY="${PUSHER_APP_KEY}"
-VITE_PUSHER_HOST="${PUSHER_HOST}"
-VITE_PUSHER_PORT="${PUSHER_PORT}"
-VITE_PUSHER_SCHEME="${PUSHER_SCHEME}"
-VITE_PUSHER_APP_CLUSTER="${PUSHER_APP_CLUSTER}"
-
-MERCHANTS_CSV_URL="https://sequra.github.io/backend-challenge/merchants.csv"
-ORDERS_CSV_URL="https://sequra.github.io/backend-challenge/orders.csv"
-````
-- .env.test
-````
-APP_NAME=sequra-challenge
-APP_ENV=local
-APP_KEY=base64:14NOgsi734l+5JPH7J3V9KHsP2Ky8uq9k//IcxiXqr0=
-APP_DEBUG=true
-APP_URL=http://localhost
-
-LOG_CHANNEL=stack
-LOG_DEPRECATIONS_CHANNEL=null
-LOG_LEVEL=debug
-
-DB_CONNECTION=pgsql
-DB_HOST=db-test
-DB_PORT=5432
-DB_DATABASE=sequra_db_test
-DB_USERNAME=sequra_user_test
-DB_PASSWORD=password
-
-BROADCAST_DRIVER=log
-CACHE_DRIVER=file
-FILESYSTEM_DISK=local
-QUEUE_CONNECTION=sync
-SESSION_DRIVER=file
-SESSION_LIFETIME=120
-
-MEMCACHED_HOST=127.0.0.1
-
-REDIS_HOST=127.0.0.1
-REDIS_PASSWORD=null
-REDIS_PORT=6379
-
-MAIL_MAILER=smtp
-MAIL_HOST=mailpit
-MAIL_PORT=1025
-MAIL_USERNAME=null
-MAIL_PASSWORD=null
-MAIL_ENCRYPTION=null
-MAIL_FROM_ADDRESS="hello@example.com"
-MAIL_FROM_NAME="${APP_NAME}"
-
-AWS_ACCESS_KEY_ID=
-AWS_SECRET_ACCESS_KEY=
-AWS_DEFAULT_REGION=us-east-1
-AWS_BUCKET=
-AWS_USE_PATH_STYLE_ENDPOINT=false
-
-PUSHER_APP_ID=
-PUSHER_APP_KEY=
-PUSHER_APP_SECRET=
-PUSHER_HOST=
-PUSHER_PORT=443
-PUSHER_SCHEME=https
-PUSHER_APP_CLUSTER=mt1
-
-VITE_APP_NAME="${APP_NAME}"
-VITE_PUSHER_APP_KEY="${PUSHER_APP_KEY}"
-VITE_PUSHER_HOST="${PUSHER_HOST}"
-VITE_PUSHER_PORT="${PUSHER_PORT}"
-VITE_PUSHER_SCHEME="${PUSHER_SCHEME}"
-VITE_PUSHER_APP_CLUSTER="${PUSHER_APP_CLUSTER}"
-
-MERCHANTS_CSV_URL="/var/www/tests/Data/merchants.csv"
-````
+## Areas for Improvement:
+- Improve testing and implement Behat to prevent regressions and ensure scalability of the project.
+- Multi-threading to enhance the performance of imports and other operations.
+- Refactor the Summary and DisbursementService classes to adhere more closely to SOLID principles (especially encapsulating responsibilities).
+- Remove Laravel examples and skeleton.
+- The design of the tables is improvable; it was done quickly yesterday morning to save time, the price paid was a single 'complicated' query.
+- Optional: Maybe some subdirectories could be created within Services and Contracts for better organization of files, but it didn't seem necessary due to the small number.

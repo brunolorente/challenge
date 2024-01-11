@@ -27,7 +27,7 @@ class EloquentMerchantRepository implements MerchantRepositoryInterface
 
     public function findAll(): array
     {
-        return Merchant::all()->toArray();
+        return Merchant::all()->all();
     }
 
     public function findMerchantOrdersByMerchantId(UuidInterface $uuid): array

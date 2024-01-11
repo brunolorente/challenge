@@ -29,7 +29,7 @@ class DisbursementServiceTest extends TestCase
         $disbursementService = $this->app->make(DisbursementService::class);
 
         // when
-        $disbursementService->calculateDisbursements(Carbon::createFromFormat('Y-m-d', '2023-02-02')->subDay());
+        $disbursementService->calculateDisbursements(Carbon::createFromFormat('Y-m-d', '2023-02-02'));
 
         // then
         $generatedDisbursement = Disbursement::where('merchant_id', 'f6a4bb66-e564-4b41-a4eb-9883ec602229')->first();
@@ -59,7 +59,7 @@ class DisbursementServiceTest extends TestCase
         foreach ($allDisbursements as $disbursement) {
             $total += $disbursement->nb_of_orders;
         }
-        $this->assertEquals(3, $total); // this is just 3 because the orders for the daily merchant are for other date
+        $this->assertEquals(6, $total); // this is just 3 because the orders for the daily merchant are for other date
     }
 
     public function testCalculateDisbursementsWithAmountOfMonthlyFeeCharged(): void
@@ -81,7 +81,7 @@ class DisbursementServiceTest extends TestCase
         foreach ($additionalFees as $additionalFee) {
             $totalAdditionalFee += $additionalFee->fee;
         }
-        $this->assertEquals(4, $total); // this is just 4 because the orders for the daily merchant are for other date
+        $this->assertEquals(1, $total); // this is just 4 because the orders for the daily merchant are for other date
         $this->assertEquals(1, $additionalFees->count());
         $this->assertEquals(29.94, $totalAdditionalFee);
     }
